@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RentalCar.API/RentalCar.API.csproj" />
+  <Project Path="RentalCar.Application/RentalCar.Application.csproj" />
+  <Project Path="RentalCar.Domain/RentalCar.Domain.csproj" />
+  <Project Path="RentalCar.Infrastructure/RentalCar.Infrastructure.csproj" />
+</Solution>
