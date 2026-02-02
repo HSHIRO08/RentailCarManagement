@@ -550,46 +550,7 @@ POST /api/auth/reset-password
 
 ---
 
-## IV. YÊU CẦU VỚI AI ASSISTANT
-
-### Khi thực hiện update, bạn cần:
-
-1. ✅ **ĐỌC KỸ toàn bộ code hiện tại** trước khi đề xuất thay đổi
-
-2. ✅ **PHÂN TÍCH cấu trúc** và relationship giữa các entities
-
-3. ✅ **XÁC ĐỊNH** những gì đã có và những gì còn thiếu
-
-4. ✅ **ĐỀ XUẤT** các thay đổi cụ thể với code samples
-
-5. ✅ **GIẢI THÍCH** lý do cho mỗi thay đổi
-
-6. ✅ **ĐẢM BẢO** tuân thủ:
-   - Clean Code principles
-   - SOLID principles
-   - ASP.NET Core best practices
-   - Entity Framework Core conventions
-   - RESTful API design
-
-7. ✅ **TẠO CODE** đầy đủ, không bỏ qua chi tiết
-
-8. ✅ **BỔ SUNG** comments và XML documentation
-
-9. ✅ **KIỂM TRA** consistency trong naming conventions
-
-10. ✅ **ƯU TIÊN** theo thứ tự:
-    - Models & Entities (cơ sở dữ liệu)
-    - DbContext & Migrations
-    - Repositories
-    - Services
-    - DTOs
-    - Controllers
-    - Authentication/Authorization
-    - Advanced Features
-
----
-
-## V. OUTPUT MONG MUỐN
+## IV. OUTPUT MONG MUỐN
 
 ### Kết quả cuối cùng cần có:
 
