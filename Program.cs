@@ -101,17 +101,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer", "Admin"));
 });
 
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -119,13 +108,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Rental Car Management API",
-        Version = "v1",
         Description = "API cho hệ thống quản lý cho thuê xe ô tô",
-        Contact = new OpenApiContact
-        {
-            Name = "Admin",
-            Email = "admin@rentalcar.com"
-        }
     });
 
     // Add JWT Authentication to Swagger
