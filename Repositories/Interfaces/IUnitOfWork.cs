@@ -30,4 +30,10 @@ public interface IUnitOfWork : IDisposable
     /// Rollback transaction
     /// </summary>
     Task RollbackAsync();
+    
+    /// <summary>
+    /// Get DbContext (for special queries not covered by repositories)
+    /// Use sparingly - prefer adding methods to repositories
+    /// </summary>
+    Models.ApplicationDbContext Context { get; }
 }

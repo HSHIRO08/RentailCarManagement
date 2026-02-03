@@ -28,6 +28,8 @@ public class UnitOfWork : IUnitOfWork
     public IPaymentRepository Payments => _payments ??= new PaymentRepository(_context);
     public ICustomerRepository Customers => _customers ??= new CustomerRepository(_context);
     public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
+    
+    public ApplicationDbContext Context => _context;
 
     public async Task<int> SaveChangesAsync()
     {

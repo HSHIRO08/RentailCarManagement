@@ -21,47 +21,60 @@ public class RentalService : IRentalService
 
     public async Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request)
     {
-        // Validate car availability
-        var isAvailable = await _unitOfWork.Cars.IsCarAvailableAsync(
-            request.CarId, request.StartDate, request.EndDate);
-
-        if (!isAvailable)
-            throw new BusinessException("Xe không khả dụng trong khoảng thời gian này");
-
-        // Validate dates
-        if (request.StartDate >= request.EndDate)
-            throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
-
-        if (request.StartDate < DateTime.UtcNow.Date)
-            throw new BusinessException("Ngày bắt đầu không thể trong quá khứ");
-
-        // Get car to calculate price
-        var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
-        if (car == null)
-            throw new NotFoundException("Xe không tồn tại");
-
-        var days = (request.EndDate - request.StartDate).Days;
-        if (days < 1) days = 1;
-
-        var totalAmount = car.PricePerDay * days;
-
-        var rental = new Rental
+        await _unitOfWork.BeginTransactionAsync();
+        
+        try
         {
-            RentalId = Guid.NewGuid(),
-            CarId = request.CarId,
-            CustomerId = request.CustomerId,
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
-            TotalAmount = totalAmount,
-            Status = "Pending",
-            CreatedAt = DateTime.UtcNow
-        };
+            // Validate car availability
+            var isAvailable = await _unitOfWork.Cars.IsCarAvailableAsync(
+                request.CarId, request.StartDate, request.EndDate);
 
-        await _unitOfWork.Rentals.AddAsync(rental);
-        await _unitOfWork.SaveChangesAsync();
+            if (!isAvailable)
+                throw new BusinessException("Xe không khả dụng trong khoảng thời gian này");
 
-        return await GetRentalDetailsAsync(rental.RentalId) 
-               ?? throw new BusinessException("Không thể tạo đơn thuê");
+            // Validate dates
+            if (request.StartDate >= request.EndDate)
+                throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
+
+            if (request.StartDate < DateTime.UtcNow.Date)
+                throw new BusinessException("Ngày bắt đầu không thể trong quá khứ");
+
+            // Get car to calculate price
+            var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
+            if (car == null)
+                throw new NotFoundException("Xe không tồn tại");
+
+            var days = (request.EndDate - request.StartDate).Days;
+            if (days < 1) days = 1;
+
+            var totalAmount = car.PricePerDay * days;
+
+            var rental = new Rental
+            {
+                RentalId = Guid.NewGuid(),
+                CarId = request.CarId,
+                CustomerId = request.CustomerId,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                TotalAmount = totalAmount,
+                Status = "Pending",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Rentals.AddAsync(rental);
+            
+            await _unitOfWork.SaveChangesAsync();
+            
+            await _unitOfWork.CommitAsync();
+
+            return await GetRentalDetailsAsync(rental.RentalId) 
+                   ?? throw new BusinessException("Không thể tạo đơn thuê");
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId)

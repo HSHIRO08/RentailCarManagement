@@ -13,12 +13,10 @@ namespace RentailCarManagement.Services.Implementations;
 public class CarService : ICarService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ApplicationDbContext _context;
 
-    public CarService(IUnitOfWork unitOfWork, ApplicationDbContext context)
+    public CarService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _context = context;
     }
 
     public async Task<PagedResult<CarResponse>> SearchAvailableCarsAsync(CarSearchCriteria criteria)
@@ -196,7 +194,7 @@ public class CarService : ICarService
 
     public async Task<IEnumerable<CarCategoryDto>> GetCategoriesAsync()
     {
-        var categories = await _context.CarCategories
+        var categories = await _unitOfWork.Context.CarCategories
             .Where(c => c.IsActive == true)
             .ToListAsync();
 
