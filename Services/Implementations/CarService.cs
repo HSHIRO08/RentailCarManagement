@@ -236,8 +236,7 @@ public class CarService : ICarService
             IsApproved = car.IsApproved,
             CategoryName = car.Category?.Name,
             SupplierName = car.Supplier?.CompanyName,
-            // Fix: CarImages is a string, not a collection. Adjust logic accordingly.
-            PrimaryImageUrl = car.CarImages, // or parse if it's a delimited string, e.g. car.CarImages?.Split(';').FirstOrDefault()
+            PrimaryImageUrl = car.CarImages, 
             CreatedAt = car.CreatedAt
         };
     }
