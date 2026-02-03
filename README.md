@@ -274,25 +274,6 @@ Tính hoa hồng:
 
 ---
 
-### F. ENUMS - ĐỊNH NGHĨA RÕ RÀNG
-
-Tạo file `Enums.cs` với:
-
-```csharp
-public enum CarStatus { Available, Rented, Maintenance, Damaged, Retired }
-public enum RentalStatus { Pending, Confirmed, Active, Completed, Cancelled }
-public enum PaymentStatus { Unpaid, Partial, Paid, Refunded }
-public enum PaymentMethod { Cash, CreditCard, DebitCard, BankTransfer, Wallet }
-public enum FuelType { Petrol, Diesel, Electric, Hybrid }
-public enum TransmissionType { Manual, Automatic, SemiAutomatic }
-public enum DocumentType { Registration, Insurance, Inspection, Ownership }
-public enum UserRole { Admin, Customer, Supplier, Staff }
-public enum NotificationType { Booking, Payment, Review, Promotion, System }
-public enum ComplaintStatus { Open, InProgress, Resolved, Closed }
-```
-
----
-
 ### G. DTOs (Data Transfer Objects)
 
 **Tạo folder DTOs với:**
