@@ -76,24 +76,6 @@ public class CarService : ICarService
                 CompanyName = car.Supplier.CompanyName,
                 IsVerified = car.Supplier.IsVerified
             } : null,
-            Images = car.CarImages?.Select(i => new CarImageDto
-            {
-                ImageId = i.ImageId,
-                ImageUrl = i.ImageUrl,
-                IsPrimary = i.IsPrimary,
-                DisplayOrder = i.DisplayOrder
-            }).ToList() ?? new List<CarImageDto>(),
-            Documents = car.CarDocuments?.Select(d => new CarDocumentDto
-            {
-                DocumentId = d.DocumentId,
-                DocumentType = d.DocumentType,
-                DocumentNumber = d.DocumentNumber,
-                ExpiryDate = d.ExpiryDate,
-                IsVerified = d.IsVerified
-            }).ToList() ?? new List<CarDocumentDto>(),
-            AverageRating = averageRating,
-            TotalReviews = reviewCount,
-            TotalRentals = rentalCount
         };
     }
 
@@ -256,8 +238,8 @@ public class CarService : ICarService
             IsApproved = car.IsApproved,
             CategoryName = car.Category?.Name,
             SupplierName = car.Supplier?.CompanyName,
-            PrimaryImageUrl = car.CarImages?.FirstOrDefault(i => i.IsPrimary == true)?.ImageUrl
-                              ?? car.CarImages?.FirstOrDefault()?.ImageUrl,
+            // Fix: CarImages is a string, not a collection. Adjust logic accordingly.
+            PrimaryImageUrl = car.CarImages, // or parse if it's a delimited string, e.g. car.CarImages?.Split(';').FirstOrDefault()
             CreatedAt = car.CreatedAt
         };
     }

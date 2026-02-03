@@ -277,8 +277,7 @@ public class RentalService : IRentalService
             CarBrand = rental.Car?.Brand,
             CarModel = rental.Car?.Model,
             CarLicensePlate = rental.Car?.LicensePlate,
-            CarImageUrl = rental.Car?.CarImages?.FirstOrDefault(i => i.IsPrimary == true)?.ImageUrl
-                          ?? rental.Car?.CarImages?.FirstOrDefault()?.ImageUrl,
+            CarImageUrl = rental.CarImages,
             CustomerName = rental.Customer?.User?.FullName,
             CustomerEmail = rental.Customer?.User?.Email,
             TotalDays = (rental.EndDate - rental.StartDate).Days,
@@ -307,8 +306,7 @@ public class RentalService : IRentalService
                 FuelType = rental.Car.FuelType,
                 Transmission = rental.Car.Transmission,
                 PricePerDay = rental.Car.PricePerDay,
-                ImageUrl = rental.Car.CarImages?.FirstOrDefault(i => i.IsPrimary == true)?.ImageUrl
-                           ?? rental.Car.CarImages?.FirstOrDefault()?.ImageUrl
+                ImageUrl = rental.Car.CarImages
             } : null,
             Customer = rental.Customer != null ? new RentalCustomerDto
             {

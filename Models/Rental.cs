@@ -34,4 +34,5 @@ public partial class Rental
     public virtual Payment? Payment { get; set; }
 
     public virtual Review? Review { get; set; }
+    public string CarImages { get; internal set; }
 }

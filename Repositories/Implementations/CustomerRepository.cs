@@ -26,7 +26,7 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
             .Include(c => c.User)
             .Include(c => c.Rentals)
                 .ThenInclude(r => r.Car)
-                    .ThenInclude(c => c.CarImages)
+                    .ThenInclude(navigationPropertyPath: c => c.CarImages)
             .Include(c => c.Rentals)
                 .ThenInclude(r => r.Payment)
             .Include(c => c.Reviews)

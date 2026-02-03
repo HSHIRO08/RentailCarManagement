@@ -37,9 +37,7 @@ public partial class Car
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<CarDocument> CarDocuments { get; set; } = new List<CarDocument>();
-
-    public virtual ICollection<CarImage> CarImages { get; set; } = new List<CarImage>();
+    public string? CarImages { get; set; } 
 
     public virtual CarCategory Category { get; set; } = null!;
 

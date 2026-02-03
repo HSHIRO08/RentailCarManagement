@@ -20,8 +20,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     // DbSets for existing entities
     public virtual DbSet<Car> Cars { get; set; }
     public virtual DbSet<CarCategory> CarCategories { get; set; }
-    public virtual DbSet<CarDocument> CarDocuments { get; set; }
-    public virtual DbSet<CarImage> CarImages { get; set; }
     public virtual DbSet<ChatSession> ChatSessions { get; set; }
     public virtual DbSet<Commission> Commissions { get; set; }
     public virtual DbSet<Complaint> Complaints { get; set; }
@@ -95,39 +93,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-        });
-
-        builder.Entity<CarImage>(entity =>
-        {
-            entity.ToTable("car_images");
-            entity.HasKey(e => e.ImageId);
-            entity.Property(e => e.ImageId).HasColumnName("image_id").HasDefaultValueSql("uuid_generate_v4()");
-            entity.Property(e => e.CarId).HasColumnName("car_id");
-            entity.Property(e => e.ImageUrl).HasColumnName("image_url");
-            entity.Property(e => e.IsPrimary).HasColumnName("is_primary").HasDefaultValue(false);
-            entity.Property(e => e.DisplayOrder).HasColumnName("display_order").HasDefaultValue(0);
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            entity.HasOne(d => d.Car).WithMany(p => p.CarImages)
-                .HasForeignKey(d => d.CarId).OnDelete(DeleteBehavior.Cascade);
-        });
-
-        builder.Entity<CarDocument>(entity =>
-        {
-            entity.ToTable("car_documents");
-            entity.HasKey(e => e.DocumentId);
-            entity.Property(e => e.DocumentId).HasColumnName("document_id").HasDefaultValueSql("uuid_generate_v4()");
-            entity.Property(e => e.CarId).HasColumnName("car_id");
-            entity.Property(e => e.DocumentType).HasColumnName("document_type").HasMaxLength(50);
-            entity.Property(e => e.DocumentNumber).HasColumnName("document_number").HasMaxLength(100);
-            entity.Property(e => e.DocumentUrl).HasColumnName("document_url");
-            entity.Property(e => e.IssueDate).HasColumnName("issue_date");
-            entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
-            entity.Property(e => e.IsVerified).HasColumnName("is_verified").HasDefaultValue(false);
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            entity.HasOne(d => d.Car).WithMany(p => p.CarDocuments)
-                .HasForeignKey(d => d.CarId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 

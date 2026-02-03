@@ -161,7 +161,6 @@ public class CarRepository : GenericRepository<Car>, ICarRepository
             .Include(c => c.Supplier)
                 .ThenInclude(s => s.User)
             .Include(c => c.CarImages)
-            .Include(c => c.CarDocuments)
             .Include(c => c.Rentals)
             .FirstOrDefaultAsync(c => c.CarId == carId);
     }
