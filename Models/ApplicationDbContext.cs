@@ -21,7 +21,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public virtual DbSet<CarCategory> CarCategories { get; set; }
     public virtual DbSet<CarDocument> CarDocuments { get; set; }
     public virtual DbSet<CarImage> CarImages { get; set; }
-    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
     public virtual DbSet<ChatSession> ChatSessions { get; set; }
     public virtual DbSet<Commission> Commissions { get; set; }
     public virtual DbSet<Complaint> Complaints { get; set; }
@@ -30,18 +29,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public virtual DbSet<Rental> Rentals { get; set; }
     public virtual DbSet<Review> Reviews { get; set; }
     public virtual DbSet<Supplier> Suppliers { get; set; }
-
-    // DbSets for new entities
-    public virtual DbSet<Promotion> Promotions { get; set; }
-    public virtual DbSet<RentalPromotion> RentalPromotions { get; set; }
-    public virtual DbSet<Insurance> Insurances { get; set; }
-    public virtual DbSet<CarInsurance> CarInsurances { get; set; }
-    public virtual DbSet<MaintenanceRecord> MaintenanceRecords { get; set; }
-    public virtual DbSet<Notification> Notifications { get; set; }
-    public virtual DbSet<RentalExtension> RentalExtensions { get; set; }
-    public virtual DbSet<DamageReport> DamageReports { get; set; }
-    public virtual DbSet<DamagePhoto> DamagePhotos { get; set; }
-    public virtual DbSet<BlockedDate> BlockedDates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -66,7 +53,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         ConfigureCarEntities(builder);
         ConfigureRentalEntities(builder);
         ConfigureUserRelatedEntities(builder);
-        ConfigureNewEntities(builder);
     }
 
     private void ConfigureCarEntities(ModelBuilder builder)
@@ -294,77 +280,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
                 .HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Restrict);
         });
 
-        builder.Entity<ChatMessage>(entity =>
-        {
-            entity.ToTable("chat_messages");
-            entity.HasKey(e => e.MessageId);
-            entity.Property(e => e.MessageId).HasColumnName("message_id").HasDefaultValueSql("uuid_generate_v4()");
-            entity.Property(e => e.ChatSessionId).HasColumnName("chat_session_id");
-            entity.Property(e => e.SenderType).HasColumnName("sender_type").HasMaxLength(20);
-            entity.Property(e => e.Content).HasColumnName("content");
-            entity.Property(e => e.IsRead).HasColumnName("is_read").HasDefaultValue(false);
-            entity.Property(e => e.SentAt).HasColumnName("sent_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            entity.HasOne(d => d.ChatSession).WithMany(p => p.ChatMessages)
-                .HasForeignKey(d => d.ChatSessionId).OnDelete(DeleteBehavior.Cascade);
-        });
-    }
-
-    private void ConfigureNewEntities(ModelBuilder builder)
-    {
-        builder.Entity<Promotion>(entity =>
-        {
-            entity.HasKey(e => e.PromotionId);
-            entity.HasIndex(e => e.CouponCode).IsUnique();
-        });
-
-        builder.Entity<RentalPromotion>(entity =>
-        {
-            entity.HasKey(e => e.RentalPromotionId);
-            entity.HasIndex(e => new { e.RentalId, e.PromotionId }).IsUnique();
-        });
-
-        builder.Entity<Insurance>(entity =>
-        {
-            entity.HasKey(e => e.InsuranceId);
-        });
-
-        builder.Entity<CarInsurance>(entity =>
-        {
-            entity.HasKey(e => e.CarInsuranceId);
-            entity.HasIndex(e => new { e.CarId, e.InsuranceId, e.StartDate }).IsUnique();
-        });
-
-        builder.Entity<MaintenanceRecord>(entity =>
-        {
-            entity.HasKey(e => e.MaintenanceId);
-        });
-
-        builder.Entity<Notification>(entity =>
-        {
-            entity.HasKey(e => e.NotificationId);
-            entity.HasIndex(e => new { e.UserId, e.IsRead });
-        });
-
-        builder.Entity<RentalExtension>(entity =>
-        {
-            entity.HasKey(e => e.ExtensionId);
-        });
-
-        builder.Entity<DamageReport>(entity =>
-        {
-            entity.HasKey(e => e.DamageReportId);
-        });
-
-        builder.Entity<DamagePhoto>(entity =>
-        {
-            entity.HasKey(e => e.PhotoId);
-        });
-
-        builder.Entity<BlockedDate>(entity =>
-        {
-            entity.HasKey(e => e.BlockedDateId);
-            entity.HasIndex(e => new { e.CarId, e.StartDate, e.EndDate });
-        });
     }
 }

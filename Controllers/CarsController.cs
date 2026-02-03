@@ -106,7 +106,6 @@ public class CarsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<CarResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateCar([FromBody] CreateCarRequest request)
     {
         if (!ModelState.IsValid)
@@ -122,7 +121,6 @@ public class CarsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<CarResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateCar(Guid id, [FromBody] UpdateCarRequest request)
     {
         var car = await _carService.UpdateCarAsync(id, request);
@@ -137,8 +135,6 @@ public class CarsController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteCar(Guid id)
     {
         var result = await _carService.DeleteCarAsync(id);
@@ -153,7 +149,6 @@ public class CarsController : ControllerBase
     /// </summary>
     [HttpPatch("{id:guid}/status")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] string status)
     {
         var result = await _carService.UpdateCarStatusAsync(id, status);

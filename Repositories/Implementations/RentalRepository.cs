@@ -10,7 +10,7 @@ namespace RentailCarManagement.Repositories.Implementations;
 /// </summary>
 public class RentalRepository : GenericRepository<Rental>, IRentalRepository
 {
-    public RentalRepository(AppDbContext context) : base(context)
+    public RentalRepository(ApplicationDbContext context) : base(context)
     {
     }
 

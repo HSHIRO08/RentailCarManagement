@@ -25,5 +25,5 @@ public partial class Complaint
 
     public virtual Rental Rental { get; set; } = null!;
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 }

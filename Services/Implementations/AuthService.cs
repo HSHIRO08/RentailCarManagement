@@ -77,39 +77,26 @@ public class AuthService : IAuthService
             };
         }
 
-        // Assign role
-        var roleName = request.AccountType ?? "Customer";
+        // Always assign Customer role by default
+        // Only Admin can change user roles later
+        const string defaultRole = "Customer";
         
         // Ensure role exists
-        if (!await _roleManager.RoleExistsAsync(roleName))
+        if (!await _roleManager.RoleExistsAsync(defaultRole))
         {
-            await _roleManager.CreateAsync(new ApplicationRole(roleName));
+            await _roleManager.CreateAsync(new ApplicationRole(defaultRole));
         }
         
-        await _userManager.AddToRoleAsync(user, roleName);
+        await _userManager.AddToRoleAsync(user, defaultRole);
 
-        // Create customer or supplier profile
-        if (roleName == "Customer")
+        // Create customer profile
+        var customer = new Customer
         {
-            var customer = new Customer
-            {
-                CustomerId = Guid.NewGuid(),
-                UserId = user.Id,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _context.Customers.AddAsync(customer);
-        }
-        else if (roleName == "Supplier")
-        {
-            var supplier = new Supplier
-            {
-                SupplierId = Guid.NewGuid(),
-                UserId = user.Id,
-                IsVerified = false,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _context.Suppliers.AddAsync(supplier);
-        }
+            CustomerId = Guid.NewGuid(),
+            UserId = user.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _context.Customers.AddAsync(customer);
 
         await _context.SaveChangesAsync();
 
@@ -159,7 +146,7 @@ public class AuthService : IAuthService
             };
         }
 
-        // Try to verify password with Identity
+        // Verify password with Identity
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
 
         if (result.IsLockedOut)
@@ -171,39 +158,13 @@ public class AuthService : IAuthService
             };
         }
 
-        // If Identity password check failed, try legacy formats and auto-migrate
         if (!result.Succeeded)
         {
-            bool legacyPasswordValid = false;
-
-            // Try bcrypt format (database uses bcrypt)
-            if (user.PasswordHash?.StartsWith("$2") == true)
+            return new AuthResponse
             {
-                try
-                {
-                    if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                    {
-                        legacyPasswordValid = true;
-                        // Auto-migrate to Identity format
-                        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                        await _userManager.ResetPasswordAsync(user, token, request.Password);
-                        _logger.LogInformation("Auto-migrated bcrypt password for user: {Email}", user.Email);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to verify bcrypt password for: {Email}", user.Email);
-                }
-            }
-
-            if (!legacyPasswordValid)
-            {
-                return new AuthResponse
-                {
-                    Success = false,
-                    Message = "Email hoặc mật khẩu không đúng"
-                };
-            }
+                Success = false,
+                Message = "Email hoặc mật khẩu không đúng"
+            };
         }
 
         var roles = await _userManager.GetRolesAsync(user);

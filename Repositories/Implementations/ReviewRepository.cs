@@ -10,7 +10,7 @@ namespace RentailCarManagement.Repositories.Implementations;
 /// </summary>
 public class ReviewRepository : GenericRepository<Review>, IReviewRepository
 {
-    public ReviewRepository(AppDbContext context) : base(context)
+    public ReviewRepository(ApplicationDbContext context) : base(context)
     {
     }
 

@@ -27,5 +27,5 @@ public partial class Supplier
 
     public virtual ICollection<Commission> Commissions { get; set; } = new List<Commission>();
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 }

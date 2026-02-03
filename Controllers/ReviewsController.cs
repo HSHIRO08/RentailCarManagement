@@ -28,7 +28,6 @@ public class ReviewsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<ReviewResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateReview([FromQuery] Guid customerId, [FromBody] CreateReviewRequest request)
     {
         if (!ModelState.IsValid)
@@ -51,7 +50,6 @@ public class ReviewsController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<ReviewResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetReviewDetails(Guid id)
     {
         var review = await _reviewService.GetReviewDetailsAsync(id);
@@ -66,7 +64,6 @@ public class ReviewsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/verify")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> VerifyReview(Guid id, [FromQuery] bool approved = true)
     {
         var result = await _reviewService.VerifyReviewAsync(id, approved);
@@ -81,7 +78,6 @@ public class ReviewsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/respond")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RespondToReview(Guid id, [FromQuery] Guid supplierId, [FromBody] ReviewResponseRequest request)
     {
         var result = await _reviewService.RespondToReviewAsync(id, supplierId, request.Response);
@@ -129,7 +125,6 @@ public class ReviewsController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteReview(Guid id)
     {
         var result = await _reviewService.DeleteReviewAsync(id);

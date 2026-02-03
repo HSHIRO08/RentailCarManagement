@@ -18,15 +18,18 @@ public class RolesController : ControllerBase
 {
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<RolesController> _logger;
 
     public RolesController(
         RoleManager<ApplicationRole> roleManager,
         UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context,
         ILogger<RolesController> logger)
     {
         _roleManager = roleManager;
         _userManager = userManager;
+        _context = context;
         _logger = logger;
     }
 
@@ -147,6 +150,9 @@ public class RolesController : ControllerBase
             return BadRequest(ApiResponse.FailResult("Không thể gán role", errors));
         }
 
+        // Auto-create profile based on role
+        await CreateProfileForRole(user.Id, request.RoleName);
+
         return Ok(ApiResponse.SuccessResult($"Đã gán role {request.RoleName} cho user"));
     }
 
@@ -219,6 +225,63 @@ public class RolesController : ControllerBase
         var roles = await _userManager.GetRolesAsync(user);
         return Ok(ApiResponse<IEnumerable<string>>.SuccessResult(roles));
     }
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Tự động tạo profile tương ứng khi gán role
+    /// </summary>
+    private async Task CreateProfileForRole(Guid userId, string roleName)
+    {
+        try
+        {
+            if (roleName == "Supplier")
+            {
+                // Kiểm tra xem đã có Supplier profile chưa
+                var existingSupplier = await _context.Suppliers
+                    .FirstOrDefaultAsync(s => s.UserId == userId);
+
+                if (existingSupplier == null)
+                {
+                    var supplier = new Supplier
+                    {
+                        SupplierId = Guid.NewGuid(),
+                        UserId = userId,
+                        IsVerified = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    await _context.Suppliers.AddAsync(supplier);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Created Supplier profile for user {UserId}", userId);
+                }
+            }
+            else if (roleName == "Customer")
+            {
+                // Kiểm tra xem đã có Customer profile chưa
+                var existingCustomer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+
+                if (existingCustomer == null)
+                {
+                    var customer = new Customer
+                    {
+                        CustomerId = Guid.NewGuid(),
+                        UserId = userId,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    await _context.Customers.AddAsync(customer);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Created Customer profile for user {UserId}", userId);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create profile for role {RoleName} and user {UserId}", roleName, userId);
+        }
+    }
+
+    #endregion
 }
 
 #region DTOs

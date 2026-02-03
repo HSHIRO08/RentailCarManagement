@@ -28,7 +28,6 @@ public class PaymentsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<PaymentResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ProcessPayment([FromBody] CreatePaymentRequest request)
     {
         if (!ModelState.IsValid)
@@ -51,7 +50,6 @@ public class PaymentsController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<PaymentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPaymentDetails(Guid id)
     {
         var payment = await _paymentService.GetPaymentDetailsAsync(id);
@@ -66,7 +64,6 @@ public class PaymentsController : ControllerBase
     /// </summary>
     [HttpGet("rental/{rentalId:guid}")]
     [ProducesResponseType(typeof(ApiResponse<PaymentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPaymentByRental(Guid rentalId)
     {
         var payment = await _paymentService.GetPaymentByRentalAsync(rentalId);
@@ -81,7 +78,6 @@ public class PaymentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/refund")]
     [ProducesResponseType(typeof(ApiResponse<PaymentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ProcessRefund(Guid id, [FromBody] RefundRequest request)
     {
         try
@@ -103,7 +99,6 @@ public class PaymentsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/verify")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> VerifyPayment(Guid id, [FromBody] string transactionId)
     {
         var result = await _paymentService.VerifyPaymentAsync(id, transactionId);

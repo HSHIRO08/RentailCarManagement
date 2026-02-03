@@ -28,7 +28,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRental([FromBody] CreateRentalRequest request)
     {
         if (!ModelState.IsValid)

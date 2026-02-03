@@ -17,7 +17,5 @@ public partial class ChatSession
 
     public DateTime? EndedAt { get; set; }
 
-    public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
-
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 }

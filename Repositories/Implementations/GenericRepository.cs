@@ -11,10 +11,10 @@ namespace RentailCarManagement.Repositories.Implementations;
 /// <typeparam name="T">Entity type</typeparam>
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    protected readonly AppDbContext _context;
+    protected readonly ApplicationDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public GenericRepository(AppDbContext context)
+    public GenericRepository(ApplicationDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();

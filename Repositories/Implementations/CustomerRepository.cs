@@ -9,7 +9,7 @@ namespace RentailCarManagement.Repositories.Implementations;
 /// </summary>
 public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(AppDbContext context) : base(context)
+    public CustomerRepository(ApplicationDbContext context) : base(context)
     {
     }
 

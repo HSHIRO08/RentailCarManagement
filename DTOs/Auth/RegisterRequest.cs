@@ -26,10 +26,4 @@ public class RegisterRequest
 
     [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
     public string? Phone { get; set; }
-
-    /// <summary>
-    /// Loại tài khoản (Customer, Supplier)
-    /// </summary>
-    [StringLength(20)]
-    public string? AccountType { get; set; } = "Customer";
 }

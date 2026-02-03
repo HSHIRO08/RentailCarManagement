@@ -13,9 +13,9 @@ namespace RentailCarManagement.Services.Implementations;
 public class CarService : ICarService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public CarService(IUnitOfWork unitOfWork, AppDbContext context)
+    public CarService(IUnitOfWork unitOfWork, ApplicationDbContext context)
     {
         _unitOfWork = unitOfWork;
         _context = context;

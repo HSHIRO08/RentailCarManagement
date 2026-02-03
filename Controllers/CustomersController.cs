@@ -27,7 +27,6 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<CustomerResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCustomerProfile(Guid id)
     {
         var customer = await _customerService.GetCustomerProfileAsync(id);
@@ -42,7 +41,6 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpGet("user/{userId:guid}")]
     [ProducesResponseType(typeof(ApiResponse<CustomerResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCustomerByUserId(Guid userId)
     {
         var customer = await _customerService.GetCustomerByUserIdAsync(userId);
@@ -57,7 +55,6 @@ public class CustomersController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<CustomerResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateCustomerRequest request)
     {
         var customer = await _customerService.UpdateCustomerProfileAsync(id, request);

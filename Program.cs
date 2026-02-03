@@ -9,7 +9,6 @@ using RentailCarManagement.Repositories.Interfaces;
 using RentailCarManagement.Repositories.Implementations;
 using RentailCarManagement.Services.Interfaces;
 using RentailCarManagement.Services.Implementations;
-using RentailCarManagement.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,10 +22,6 @@ builder.Services.AddControllers()
 
 // DbContext with Identity
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Legacy DbContext (for existing repositories - can be removed later)
-builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ASP.NET Core Identity
@@ -89,7 +84,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"] ?? "RentalCarManagement",
         ValidAudience = jwtSettings["Audience"] ?? "RentalCarManagement",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+        NameClaimType = System.Security.Claims.ClaimTypes.Name
     };
 });
 
@@ -150,12 +147,6 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "swagger";
     });
 }
-
-// Global Exception Handler
-app.UseExceptionHandling();
-
-// Request Logging
-app.UseRequestLogging();
 
 app.UseHttpsRedirection();
 

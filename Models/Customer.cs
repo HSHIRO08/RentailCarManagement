@@ -21,5 +21,5 @@ public partial class Customer
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 }

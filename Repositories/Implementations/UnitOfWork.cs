@@ -9,7 +9,7 @@ namespace RentailCarManagement.Repositories.Implementations;
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
     private IDbContextTransaction? _transaction;
 
     private ICarRepository? _cars;
@@ -18,7 +18,7 @@ public class UnitOfWork : IUnitOfWork
     private ICustomerRepository? _customers;
     private IReviewRepository? _reviews;
 
-    public UnitOfWork(AppDbContext context)
+    public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
     }
