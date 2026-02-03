@@ -21,60 +21,48 @@ public class RentalService : IRentalService
 
     public async Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request)
     {
-        await _unitOfWork.BeginTransactionAsync();
         
-        try
+        // Validate car availability
+        var isAvailable = await _unitOfWork.Cars.IsCarAvailableAsync(
+            request.CarId, request.StartDate, request.EndDate);
+
+        if (!isAvailable)
+            throw new BusinessException("Xe không khả dụng trong khoảng thời gian này");
+
+        // Validate dates
+        if (request.StartDate >= request.EndDate)
+            throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
+
+        if (request.StartDate < DateTime.UtcNow.Date)
+            throw new BusinessException("Ngày bắt đầu không thể trong quá khứ");
+
+        // Get car to calculate price
+        var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
+        if (car == null)
+            throw new NotFoundException("Xe không tồn tại");
+
+        var days = (request.EndDate - request.StartDate).Days;
+        if (days < 1) days = 1;
+
+        var totalAmount = car.PricePerDay * days;
+
+        var rental = new Rental
         {
-            // Validate car availability
-            var isAvailable = await _unitOfWork.Cars.IsCarAvailableAsync(
-                request.CarId, request.StartDate, request.EndDate);
+            RentalId = Guid.NewGuid(),
+            CarId = request.CarId,
+            CustomerId = request.CustomerId,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            TotalAmount = totalAmount,
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
 
-            if (!isAvailable)
-                throw new BusinessException("Xe không khả dụng trong khoảng thời gian này");
+        await _unitOfWork.Rentals.AddAsync(rental);
+        await _unitOfWork.SaveChangesAsync();  //Chỉ cần SaveChanges
 
-            // Validate dates
-            if (request.StartDate >= request.EndDate)
-                throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
-
-            if (request.StartDate < DateTime.UtcNow.Date)
-                throw new BusinessException("Ngày bắt đầu không thể trong quá khứ");
-
-            // Get car to calculate price
-            var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
-            if (car == null)
-                throw new NotFoundException("Xe không tồn tại");
-
-            var days = (request.EndDate - request.StartDate).Days;
-            if (days < 1) days = 1;
-
-            var totalAmount = car.PricePerDay * days;
-
-            var rental = new Rental
-            {
-                RentalId = Guid.NewGuid(),
-                CarId = request.CarId,
-                CustomerId = request.CustomerId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                TotalAmount = totalAmount,
-                Status = "Pending",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _unitOfWork.Rentals.AddAsync(rental);
-            
-            await _unitOfWork.SaveChangesAsync();
-            
-            await _unitOfWork.CommitAsync();
-
-            return await GetRentalDetailsAsync(rental.RentalId) 
-                   ?? throw new BusinessException("Không thể tạo đơn thuê");
-        }
-        catch
-        {
-            await _unitOfWork.RollbackAsync();
-            throw;
-        }
+        return await GetRentalDetailsAsync(rental.RentalId) 
+               ?? throw new BusinessException("Không thể tạo đơn thuê");
     }
 
     public async Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId)
@@ -103,68 +91,60 @@ public class RentalService : IRentalService
 
     public async Task<bool> StartRentalAsync(Guid rentalId)
     {
-        var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
-        if (rental == null || rental.Status != "Confirmed")
-            return false;
-
-        rental.Status = "Active";
-        rental.UpdatedAt = DateTime.UtcNow;
-
-        _unitOfWork.Rentals.Update(rental);
-
-        // Update car status
-        var car = await _unitOfWork.Cars.GetByIdAsync(rental.CarId);
-        if (car != null)
+        await _unitOfWork.BeginTransactionAsync();  //THÊM transaction
+        
+        try
         {
-            car.Status = "Rented";
-            car.UpdatedAt = DateTime.UtcNow;
-            _unitOfWork.Cars.Update(car);
+            var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
+            if (rental == null || rental.Status != "Confirmed")
+            {
+                await _unitOfWork.RollbackAsync();
+                return false;
+            }
+
+            rental.Status = "Active";
+            rental.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Rentals.Update(rental);
+
+            // Update car status
+            var car = await _unitOfWork.Cars.GetByIdAsync(rental.CarId);
+            if (car != null)
+            {
+                car.Status = "Rented";
+                car.UpdatedAt = DateTime.UtcNow;
+                _unitOfWork.Cars.Update(car);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();  // THÊM commit
+            
+            return true;
         }
-
-        await _unitOfWork.SaveChangesAsync();
-
-        return true;
+        catch
+        {
+            await _unitOfWork.RollbackAsync();  // THÊM rollback
+            throw;
+        }
     }
 
     public async Task<bool> CompleteRentalAsync(Guid rentalId, DateTime? actualReturnDate = null)
     {
-        var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
-        if (rental == null || rental.Status != "Active")
-            return false;
-
-        rental.Status = "Completed";
-        rental.UpdatedAt = DateTime.UtcNow;
-
-        _unitOfWork.Rentals.Update(rental);
-
-        // Update car status
-        var car = await _unitOfWork.Cars.GetByIdAsync(rental.CarId);
-        if (car != null)
+        await _unitOfWork.BeginTransactionAsync();  // THÊM transaction
+        
+        try
         {
-            car.Status = "Available";
-            car.UpdatedAt = DateTime.UtcNow;
-            _unitOfWork.Cars.Update(car);
-        }
+            var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
+            if (rental == null || rental.Status != "Active")
+            {
+                await _unitOfWork.RollbackAsync();
+                return false;
+            }
 
-        await _unitOfWork.SaveChangesAsync();
+            rental.Status = "Completed";
+            rental.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Rentals.Update(rental);
 
-        return true;
-    }
-
-    public async Task<bool> CancelRentalAsync(Guid rentalId, string reason)
-    {
-        var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
-        if (rental == null || rental.Status == "Completed" || rental.Status == "Cancelled")
-            return false;
-
-        rental.Status = "Cancelled";
-        rental.UpdatedAt = DateTime.UtcNow;
-
-        _unitOfWork.Rentals.Update(rental);
-
-        // If car was rented, make it available again
-        if (rental.Status == "Active")
-        {
+            // Update car status
             var car = await _unitOfWork.Cars.GetByIdAsync(rental.CarId);
             if (car != null)
             {
@@ -172,11 +152,61 @@ public class RentalService : IRentalService
                 car.UpdatedAt = DateTime.UtcNow;
                 _unitOfWork.Cars.Update(car);
             }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();  // THÊM commit
+            
+            return true;
         }
+        catch
+        {
+            await _unitOfWork.RollbackAsync();  // THÊM rollback
+            throw;
+        }
+    }
 
-        await _unitOfWork.SaveChangesAsync();
+    public async Task<bool> CancelRentalAsync(Guid rentalId, string reason)
+    {
+        await _unitOfWork.BeginTransactionAsync();  // THÊM transaction
+        
+        try
+        {
+            var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
+            if (rental == null || rental.Status == "Completed" || rental.Status == "Cancelled")
+            {
+                await _unitOfWork.RollbackAsync();
+                return false;
+            }
 
-        return true;
+            // BUG: Kiểm tra status trước khi update
+            var wasActive = rental.Status == "Active";  // FIX
+
+            rental.Status = "Cancelled";
+            rental.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Rentals.Update(rental);
+
+            // If car was rented, make it available again
+            if (wasActive)  // FIX: Dùng biến cũ
+            {
+                var car = await _unitOfWork.Cars.GetByIdAsync(rental.CarId);
+                if (car != null)
+                {
+                    car.Status = "Available";
+                    car.UpdatedAt = DateTime.UtcNow;
+                    _unitOfWork.Cars.Update(car);
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();  // THÊM commit
+            
+            return true;
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync();  // THÊM rollback
+            throw;
+        }
     }
 
     public async Task<RentalDetailResponse?> ExtendRentalAsync(Guid rentalId, ExtendRentalRequest request)
