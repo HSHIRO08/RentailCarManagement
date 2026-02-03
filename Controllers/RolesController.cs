@@ -58,7 +58,6 @@ public class RolesController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<RoleDto>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
     {
         if (await _roleManager.RoleExistsAsync(request.Name))
@@ -95,7 +94,6 @@ public class RolesController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRole(Guid id)
     {
         var role = await _roleManager.FindByIdAsync(id.ToString());
@@ -124,7 +122,6 @@ public class RolesController : ControllerBase
     /// </summary>
     [HttpPost("assign")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AssignRoleToUser([FromBody] AssignRoleRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
@@ -161,7 +158,6 @@ public class RolesController : ControllerBase
     /// </summary>
     [HttpPost("remove")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RemoveRoleFromUser([FromBody] AssignRoleRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());

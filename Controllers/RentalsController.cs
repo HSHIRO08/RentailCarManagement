@@ -50,7 +50,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRentalDetails(Guid id)
     {
         var rental = await _rentalService.GetRentalDetailsAsync(id);
@@ -65,7 +64,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/confirm")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConfirmRental(Guid id)
     {
         var result = await _rentalService.ConfirmRentalAsync(id);
@@ -80,7 +78,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/start")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> StartRental(Guid id)
     {
         var result = await _rentalService.StartRentalAsync(id);
@@ -95,7 +92,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/complete")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CompleteRental(Guid id, [FromQuery] DateTime? actualReturnDate = null)
     {
         var result = await _rentalService.CompleteRentalAsync(id, actualReturnDate);
@@ -110,7 +106,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/cancel")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CancelRental(Guid id, [FromBody] CancelRentalRequest request)
     {
         var result = await _rentalService.CancelRentalAsync(id, request.CancellationReason);
@@ -125,7 +120,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/extend")]
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ExtendRental(Guid id, [FromBody] ExtendRentalRequest request)
     {
         try
@@ -147,7 +141,6 @@ public class RentalsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateRental(Guid id, [FromBody] UpdateRentalRequest request)
     {
         var rental = await _rentalService.UpdateRentalAsync(id, request);
