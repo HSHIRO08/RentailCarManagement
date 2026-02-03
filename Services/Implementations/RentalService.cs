@@ -59,7 +59,7 @@ public class RentalService : IRentalService
         };
 
         await _unitOfWork.Rentals.AddAsync(rental);
-        await _unitOfWork.SaveChangesAsync();  //Chỉ cần SaveChanges
+        await _unitOfWork.SaveChangesAsync(); 
 
         return await GetRentalDetailsAsync(rental.RentalId) 
                ?? throw new BusinessException("Không thể tạo đơn thuê");
