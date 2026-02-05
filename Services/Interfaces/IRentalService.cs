@@ -72,4 +72,5 @@ public interface IRentalService
     /// Lấy các đơn thuê đang active
     /// </summary>
     Task<IEnumerable<RentalResponse>> GetActiveRentalsAsync();
+    Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId);
 }

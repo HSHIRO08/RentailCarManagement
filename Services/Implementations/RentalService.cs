@@ -21,6 +21,7 @@ public class RentalService : IRentalService
 
     public async Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request)
     {
+        {
             if (request.StartDate >= request.EndDate)
                 throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
 
@@ -52,12 +53,31 @@ public class RentalService : IRentalService
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdRental = await _unitOfWork.Rentals.GetRentalWithDetailsAsync(rental.RentalId)
-                                 ?? throw new NotFoundException("Không thể lấy thông tin thuê xe vừa tạo");
-
-            return MapToRentalDetailResponse(createdRental);
-        
+            return new RentalDetailResponse
+            {
+                RentalId = rental.RentalId,
+                StartDate = rental.StartDate,
+                EndDate = rental.EndDate,
+                TotalAmount = rental.TotalAmount,
+                Status = rental.Status,
+                CreatedAt = rental.CreatedAt,
+                Car = new RentalCarDto
+                {
+                    CarId = car.CarId,
+                    Brand = car.Brand,
+                    Model = car.Model,
+                    LicensePlate = car.LicensePlate,
+                    Year = car.Year,
+                    FuelType = car.FuelType,
+                    Transmission = car.Transmission,
+                    PricePerDay = car.PricePerDay,
+                    ImageUrl = car.CarImages
+                },
+                TotalDays = days
+            };
+        }
     }
+      
 
 
     public async Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId)
