@@ -84,29 +84,43 @@ public class CarService : ICarService
 
     public async Task<CarResponse> CreateCarAsync(CreateCarRequest request)
     {
-        var car = new Car
+        using var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync();
+
+        try
         {
-            CarId = Guid.NewGuid(),
-            SupplierId = request.SupplierId,
-            CategoryId = request.CategoryId,
-            LicensePlate = request.LicensePlate,
-            Brand = request.Brand,
-            Model = request.Model,
-            Year = request.Year,
-            Seats = request.Seats,
-            FuelType = request.FuelType,
-            Transmission = request.Transmission,
-            PricePerDay = request.PricePerDay,
-            PricePerHour = request.PricePerHour,
-            Status = "Available",
-            IsApproved = false,
-            CreatedAt = DateTime.UtcNow
-        };
+            var car = new Car
+            {
+                CarId = Guid.NewGuid(),
+                SupplierId = request.SupplierId,
+                CategoryId = request.CategoryId,
+                LicensePlate = request.LicensePlate,
+                Brand = request.Brand,
+                Model = request.Model,
+                Year = request.Year,
+                Seats = request.Seats,
+                FuelType = request.FuelType,
+                Transmission = request.Transmission,
+                PricePerDay = request.PricePerDay,
+                PricePerHour = request.PricePerHour,
+                Status = "Available",
+                IsApproved = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
-        await _unitOfWork.Cars.AddAsync(car);
-        await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Cars.AddAsync(car);
 
-        return MapToCarResponse(car);
+            await _unitOfWork.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return MapToCarResponse(car);
+
+        }
+        catch (Exception ex) 
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<CarResponse?> UpdateCarAsync(Guid carId, UpdateCarRequest request)
