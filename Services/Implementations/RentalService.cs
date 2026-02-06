@@ -2,6 +2,7 @@
 using RentailCarManagement.DTOs.Rental;
 using RentailCarManagement.Exceptions;
 using RentailCarManagement.Models;
+using RentailCarManagement.Repositories.Implementations;
 using RentailCarManagement.Repositories.Interfaces;
 using RentailCarManagement.Services.Interfaces;
 
@@ -52,29 +53,7 @@ public class RentalService : IRentalService
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
-
-            return new RentalDetailResponse
-            {
-                RentalId = rental.RentalId,
-                StartDate = rental.StartDate,
-                EndDate = rental.EndDate,
-                TotalAmount = rental.TotalAmount,
-                Status = rental.Status,
-                CreatedAt = rental.CreatedAt,
-                Car = new RentalCarDto
-                {
-                    CarId = car.CarId,
-                    Brand = car.Brand,
-                    Model = car.Model,
-                    LicensePlate = car.LicensePlate,
-                    Year = car.Year,
-                    FuelType = car.FuelType,
-                    Transmission = car.Transmission,
-                    PricePerDay = car.PricePerDay,
-                    ImageUrl = car.CarImages
-                },
-                TotalDays = days
-            };
+            return MapToRentalDetailResponse(rental);
         }
     }
       

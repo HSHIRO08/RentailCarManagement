@@ -84,10 +84,7 @@ public class CarService : ICarService
 
     public async Task<CarResponse> CreateCarAsync(CreateCarRequest request)
     {
-        using var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync();
 
-        try
-        {
             var car = new Car
             {
                 CarId = Guid.NewGuid(),
@@ -107,20 +104,8 @@ public class CarService : ICarService
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _unitOfWork.Cars.AddAsync(car);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-
             return MapToCarResponse(car);
 
-        }
-        catch (Exception ex) 
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
     }
 
     public async Task<CarResponse?> UpdateCarAsync(Guid carId, UpdateCarRequest request)
