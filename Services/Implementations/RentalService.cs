@@ -201,7 +201,6 @@ public class RentalService : IRentalService
         rental.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Rentals.Update(rental);
-        await _unitOfWork.SaveChangesAsync();
 
         return await GetRentalDetailsAsync(rentalId);
     }

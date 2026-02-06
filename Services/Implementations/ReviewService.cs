@@ -48,9 +48,6 @@ public class ReviewService : IReviewService
             CreatedAt = DateTime.UtcNow
         };
 
-        await _unitOfWork.Reviews.AddAsync(review);
-        await _unitOfWork.SaveChangesAsync();
-
         return await GetReviewDetailsAsync(review.ReviewId) 
                ?? throw new BusinessException("Không thể tạo đánh giá");
     }
@@ -76,7 +73,6 @@ public class ReviewService : IReviewService
 
         review.IsApproved = approved;
         _unitOfWork.Reviews.Update(review);
-        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -140,7 +136,6 @@ public class ReviewService : IReviewService
             return false;
 
         _unitOfWork.Reviews.Delete(review);
-        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }

@@ -140,7 +140,6 @@ public class CarService : ICarService
         car.UpdatedAt = DateTime.UtcNow;
 
         _unitOfWork.Cars.Update(car);
-        await _unitOfWork.SaveChangesAsync();
 
         return MapToCarResponse(car);
     }

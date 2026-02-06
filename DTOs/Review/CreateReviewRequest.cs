@@ -11,7 +11,7 @@ public class CreateReviewRequest
     public Guid RentalId { get; set; }
 
     [Required(ErrorMessage = "Đánh giá là bắt buộc")]
-    [Range(1, 5, ErrorMessage = "Đánh giá phải từ 1-5 sao")]
+    [Range(1, 5, ErrorMessage = "Đánh giá phải từ 1-5 sao")]    
     public int Rating { get; set; }
 
     [StringLength(2000)]

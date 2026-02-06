@@ -40,8 +40,6 @@ public class PaymentService : IPaymentService
             CreatedAt = DateTime.UtcNow
         };
 
-        await _unitOfWork.Payments.AddAsync(payment);
-        await _unitOfWork.SaveChangesAsync();
 
         return MapToPaymentResponse(payment, rental);
     }
@@ -95,7 +93,6 @@ public class PaymentService : IPaymentService
         payment.PaidAt = DateTime.UtcNow;
 
         _unitOfWork.Payments.Update(payment);
-        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
