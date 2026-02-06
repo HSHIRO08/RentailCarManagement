@@ -48,7 +48,6 @@ public class CarRepository : GenericRepository<Car>, ICarRepository
                 c.Model.Contains(criteria.Keyword) ||
                 c.LicensePlate.Contains(criteria.Keyword));
         }
-
         if (criteria.CategoryId.HasValue)
             query = query.Where(c => c.CategoryId == criteria.CategoryId.Value);
 

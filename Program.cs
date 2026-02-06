@@ -91,12 +91,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("SupplierOnly", policy => policy.RequireRole("Supplier", "Admin"));
-    options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer", "Admin"));
-});
+builder.Services.AddAuthorizationBuilder()
+                    // Authorization
+                    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"))
+                    // Authorization
+                    .AddPolicy("SupplierOnly", policy => policy.RequireRole("Supplier", "Admin"))
+                    // Authorization
+                    .AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer", "Admin"));
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

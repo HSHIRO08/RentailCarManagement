@@ -17,7 +17,7 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
     {
         return await _dbSet
             .Include(c => c.User)
-            .FirstOrDefaultAsync(c => c.UserId == userId);
+            .FirstOrDefaultAsync(c => c.UserId == userId);  
     }
 
     public async Task<Customer?> GetCustomerWithRentalsAsync(Guid customerId)

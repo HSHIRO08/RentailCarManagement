@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.OpenApi.MicrosoftExtensions;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RentailCarManagement.DTOs.Auth;
 
@@ -9,6 +11,7 @@ public class LoginRequest
 {
     [Required(ErrorMessage = "Email là bắt buộc")]
     [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+
     public string Email { get; set; } = null!;
 
     [Required(ErrorMessage = "Mật khẩu là bắt buộc")]

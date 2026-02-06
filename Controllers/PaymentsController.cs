@@ -139,5 +139,6 @@ public class PaymentsController : ControllerBase
     {
         var revenue = await _paymentService.GetTotalRevenueAsync(fromDate, toDate);
         return Ok(ApiResponse<decimal>.SuccessResult(revenue));
+
     }
 }
