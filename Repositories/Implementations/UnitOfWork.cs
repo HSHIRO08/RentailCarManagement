@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using RentailCarManagement.Models;
 using RentailCarManagement.Repositories.Interfaces;
+using System.Transactions;
 
 namespace RentailCarManagement.Repositories.Implementations;
 
@@ -38,7 +39,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task BeginTransactionAsync()
     {
-        _transaction = await _context.Database.BeginTransactionAsync();
+        _transaction = await _context.Database.BeginTransactionAsync(); 
     }
 
     public async Task CommitAsync()

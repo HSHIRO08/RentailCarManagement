@@ -22,7 +22,6 @@ public class RentalService : IRentalService
 
     public async Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request)
     {
-        {
             if (request.StartDate >= request.EndDate)
                 throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
 
@@ -54,7 +53,6 @@ public class RentalService : IRentalService
                 CreatedAt = DateTime.UtcNow
             };
             return MapToRentalDetailResponse(rental);
-        }
     }
       
 
