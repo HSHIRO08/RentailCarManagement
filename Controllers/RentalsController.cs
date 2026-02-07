@@ -35,7 +35,7 @@ public class RentalsController : ControllerBase
 
         try
         {
-            var rental = await _rentalService.CreateRentalAsync(request);
+            var rental = await _rentalService.Create(request);
             return CreatedAtAction(nameof(GetRentalDetails), new { id = rental.RentalId },
                 ApiResponse<RentalDetailResponse>.SuccessResult(rental, "Tạo đơn thuê thành công"));
         }
@@ -52,7 +52,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetRentalDetails(Guid id)
     {
-        var rental = await _rentalService.GetRentalDetailsAsync(id);
+        var rental = await _rentalService.Get(id);
         if (rental == null)
             return NotFound(ApiResponse.FailResult("Đơn thuê không tồn tại"));
 
@@ -80,7 +80,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> StartRental(Guid id)
     {
-        var result = await _rentalService.StartRentalAsync(id);
+        var result = await _rentalService.Start(id);
         if (!result)
             return BadRequest(ApiResponse.FailResult("Không thể bắt đầu thuê xe"));
 
@@ -94,7 +94,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CompleteRental(Guid id, [FromQuery] DateTime? actualReturnDate = null)
     {
-        var result = await _rentalService.CompleteRentalAsync(id, actualReturnDate);
+        var result = await _rentalService.Complete(id, actualReturnDate);
         if (!result)
             return BadRequest(ApiResponse.FailResult("Không thể hoàn thành đơn thuê"));
 
@@ -108,7 +108,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelRental(Guid id, [FromBody] CancelRentalRequest request)
     {
-        var result = await _rentalService.CancelRentalAsync(id, request.CancellationReason);
+        var result = await _rentalService.Cancel(id, request.CancellationReason);
         if (!result)
             return BadRequest(ApiResponse.FailResult("Không thể hủy đơn thuê"));
 
@@ -124,7 +124,7 @@ public class RentalsController : ControllerBase
     {
         try
         {
-            var rental = await _rentalService.ExtendRentalAsync(id, request);
+            var rental = await _rentalService.Extend(id, request);
             if (rental == null)
                 return BadRequest(ApiResponse.FailResult("Không thể gia hạn đơn thuê"));
 
@@ -143,7 +143,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<RentalDetailResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateRental(Guid id, [FromBody] UpdateRentalRequest request)
     {
-        var rental = await _rentalService.UpdateRentalAsync(id, request);
+        var rental = await _rentalService.Update(id, request);
         if (rental == null)
             return NotFound(ApiResponse.FailResult("Đơn thuê không tồn tại"));
 
@@ -157,7 +157,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<PagedResult<RentalResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyRentals(Guid customerId, [FromQuery] RentalFilterCriteria criteria)
     {
-        var rentals = await _rentalService.GetCustomerRentalsAsync(customerId, criteria);
+        var rentals = await _rentalService.GetCustomer(customerId, criteria);
         return Ok(ApiResponse<PagedResult<RentalResponse>>.SuccessResult(rentals));
     }
 
@@ -179,7 +179,7 @@ public class RentalsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<PagedResult<RentalResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchRentals([FromQuery] RentalFilterCriteria criteria)
     {
-        var rentals = await _rentalService.SearchRentalsAsync(criteria);
+        var rentals = await _rentalService.Search(criteria);
         return Ok(ApiResponse<PagedResult<RentalResponse>>.SuccessResult(rentals));
     }
 
@@ -205,7 +205,7 @@ public class RentalsController : ControllerBase
         [FromQuery] DateTime endDate,
         [FromQuery] string? couponCode = null)
     {
-        var amount = await _rentalService.CalculateTotalAmountAsync(carId, startDate, endDate, couponCode);
+        var amount = await _rentalService.CalculateTotal(carId, startDate, endDate, couponCode);
         return Ok(ApiResponse<decimal>.SuccessResult(amount));
     }
 }

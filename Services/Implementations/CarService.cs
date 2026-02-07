@@ -26,7 +26,7 @@ public class CarService : ICarService
         var carResponses = cars.Select(MapToCarResponse).ToList();
 
         return new PagedResult<CarResponse>
-        {
+        {   
             Items = carResponses,
             TotalItems = totalCount,
             PageNumber = criteria.Page,

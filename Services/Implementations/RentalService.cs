@@ -5,6 +5,7 @@ using RentailCarManagement.Models;
 using RentailCarManagement.Repositories.Implementations;
 using RentailCarManagement.Repositories.Interfaces;
 using RentailCarManagement.Services.Interfaces;
+using System.Net.WebSockets;
 
 namespace RentailCarManagement.Services.Implementations;
 
@@ -20,7 +21,7 @@ public class RentalService : IRentalService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request)
+    public async Task<RentalDetailResponse> Create(CreateRentalRequest request)
     {
             if (request.StartDate >= request.EndDate)
                 throw new BusinessException("Ngày kết thúc phải sau ngày bắt đầu");
@@ -52,12 +53,16 @@ public class RentalService : IRentalService
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
-            return MapToRentalDetailResponse(rental);
+
+            var createdRental = await _unitOfWork.Rentals.AddAsync(rental);
+            return await Get(createdRental.RentalId)
+                ?? throw new Exception("Đã xảy ra lỗi khi tạo đơn thuê");
+
     }
       
 
 
-    public async Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId)
+    public async Task<RentalDetailResponse?> Get(Guid rentalId)
     {
         var rental = await _unitOfWork.Rentals.GetRentalWithDetailsAsync(rentalId);
         if (rental == null)
@@ -81,7 +86,7 @@ public class RentalService : IRentalService
         return true;
     }
 
-    public async Task<bool> StartRentalAsync(Guid rentalId)
+    public async Task<bool> Start(Guid rentalId)
     {
             var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
             if (rental == null || rental.Status != "Confirmed")
@@ -102,10 +107,12 @@ public class RentalService : IRentalService
                 _unitOfWork.Cars.Update(car);
             }
 
-            return true;
+            await _unitOfWork.SaveChangesAsync();
+
+        return true;
     }
 
-    public async Task<bool> CompleteRentalAsync(Guid rentalId, DateTime? actualReturnDate = null)
+    public async Task<bool> Complete(Guid rentalId, DateTime? actualReturnDate = null)
     {
             var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
             if (rental == null || rental.Status != "Active")
@@ -131,7 +138,7 @@ public class RentalService : IRentalService
             return true;
     }
 
-    public async Task<bool> CancelRentalAsync(Guid rentalId, string reason)
+    public async Task<bool> Cancel(Guid rentalId, string reason)
     {
 
             var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
@@ -162,7 +169,7 @@ public class RentalService : IRentalService
        }
         
 
-    public async Task<RentalDetailResponse?> ExtendRentalAsync(Guid rentalId, ExtendRentalRequest request)
+    public async Task<RentalDetailResponse?> Extend(Guid rentalId, ExtendRentalRequest request)
     {
         var rental = await _unitOfWork.Rentals.GetRentalWithDetailsAsync(rentalId);
         if (rental == null || rental.Status != "Active")
@@ -184,10 +191,10 @@ public class RentalService : IRentalService
 
         _unitOfWork.Rentals.Update(rental);
 
-        return await GetRentalDetailsAsync(rentalId);
+        return await Get(rentalId);
     }
 
-    public async Task<RentalDetailResponse?> UpdateRentalAsync(Guid rentalId, UpdateRentalRequest request)
+    public async Task<RentalDetailResponse?> Update(Guid rentalId, UpdateRentalRequest request)
     {
         var rental = await _unitOfWork.Rentals.GetByIdAsync(rentalId);
         if (rental == null)
@@ -202,10 +209,10 @@ public class RentalService : IRentalService
 
         _unitOfWork.Rentals.Update(rental);
 
-        return await GetRentalDetailsAsync(rentalId);
+        return await Get(rentalId);
     }
 
-    public async Task<decimal> CalculateTotalAmountAsync(Guid carId, DateTime startDate, DateTime endDate, string? couponCode = null)
+    public async Task<decimal> CalculateTotal(Guid carId, DateTime startDate, DateTime endDate, string? couponCode = null)
     {
         var car = await _unitOfWork.Cars.GetByIdAsync(carId);
         if (car == null)
@@ -219,19 +226,19 @@ public class RentalService : IRentalService
         return total;
     }
 
-    public async Task<PagedResult<RentalResponse>> GetCustomerRentalsAsync(Guid customerId, RentalFilterCriteria criteria)
+    public async Task<PagedResult<RentalResponse>> GetCustomer(Guid customerId, RentalFilterCriteria criteria)
     {
         criteria.CustomerId = customerId;
-        return await SearchRentalsAsync(criteria);
+        return await Search(criteria);
     }
 
     public async Task<PagedResult<RentalResponse>> GetSupplierRentalsAsync(Guid supplierId, RentalFilterCriteria criteria)
     {
         criteria.SupplierId = supplierId;
-        return await SearchRentalsAsync(criteria);
+        return await Search(criteria);
     }
 
-    public async Task<PagedResult<RentalResponse>> SearchRentalsAsync(RentalFilterCriteria criteria)
+    public async Task<PagedResult<RentalResponse>> Search(RentalFilterCriteria criteria)
     {
         var (rentals, totalCount) = await _unitOfWork.Rentals.SearchRentalsAsync(criteria);
 

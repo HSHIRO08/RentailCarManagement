@@ -11,12 +11,12 @@ public interface IRentalService
     /// <summary>
     /// Tạo đơn thuê mới
     /// </summary>
-    Task<RentalDetailResponse> CreateRentalAsync(CreateRentalRequest request);
+    Task<RentalDetailResponse> Create(CreateRentalRequest request);
 
     /// <summary>
     /// Lấy chi tiết đơn thuê
     /// </summary>
-    Task<RentalDetailResponse?> GetRentalDetailsAsync(Guid rentalId);
+    Task<RentalDetailResponse?> Get(Guid rentalId);
 
     /// <summary>
     /// Xác nhận đơn thuê
@@ -26,37 +26,37 @@ public interface IRentalService
     /// <summary>
     /// Bắt đầu thuê xe
     /// </summary>
-    Task<bool> StartRentalAsync(Guid rentalId);
+    Task<bool> Start(Guid rentalId);
 
     /// <summary>
     /// Hoàn thành đơn thuê
     /// </summary>
-    Task<bool> CompleteRentalAsync(Guid rentalId, DateTime? actualReturnDate = null);
+    Task<bool> Complete(Guid rentalId, DateTime? actualReturnDate = null);
 
     /// <summary>
     /// Hủy đơn thuê
     /// </summary>
-    Task<bool> CancelRentalAsync(Guid rentalId, string reason);
+    Task<bool> Cancel(Guid rentalId, string reason);
 
     /// <summary>
     /// Gia hạn đơn thuê
     /// </summary>
-    Task<RentalDetailResponse?> ExtendRentalAsync(Guid rentalId, ExtendRentalRequest request);
+    Task<RentalDetailResponse?> Extend(Guid rentalId, ExtendRentalRequest request);
 
     /// <summary>
     /// Cập nhật đơn thuê
     /// </summary>
-    Task<RentalDetailResponse?> UpdateRentalAsync(Guid rentalId, UpdateRentalRequest request);
+    Task<RentalDetailResponse?> Update(Guid rentalId, UpdateRentalRequest request);
 
     /// <summary>
     /// Tính tổng tiền thuê
     /// </summary>
-    Task<decimal> CalculateTotalAmountAsync(Guid carId, DateTime startDate, DateTime endDate, string? couponCode = null);
+    Task<decimal> CalculateTotal(Guid carId, DateTime startDate, DateTime endDate, string? couponCode = null);
 
     /// <summary>
     /// Lấy danh sách đơn thuê của khách hàng
     /// </summary>
-    Task<PagedResult<RentalResponse>> GetCustomerRentalsAsync(Guid customerId, RentalFilterCriteria criteria);
+    Task<PagedResult<RentalResponse>> GetCustomer(Guid customerId, RentalFilterCriteria criteria);
 
     /// <summary>
     /// Lấy danh sách đơn thuê của nhà cung cấp
@@ -66,7 +66,7 @@ public interface IRentalService
     /// <summary>
     /// Tìm kiếm đơn thuê
     /// </summary>
-    Task<PagedResult<RentalResponse>> SearchRentalsAsync(RentalFilterCriteria criteria);
+    Task<PagedResult<RentalResponse>> Search(RentalFilterCriteria criteria);
 
     /// <summary>
     /// Lấy các đơn thuê đang active
